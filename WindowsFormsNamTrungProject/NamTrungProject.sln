@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NamTrungProject", "WindowsFormsNamTrungProject\NamTrungProject.csproj", "{ECB5DCA4-638E-4C78-8C47-0B8B8F01BBB7}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupNT2", "SetupNT2\SetupNT2.vdproj", "{79CDA18D-77A8-4900-AD7A-6817B3E0A914}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECB5DCA4-638E-4C78-8C47-0B8B8F01BBB7}.Debug|x86.ActiveCfg = Debug|x86
+		{ECB5DCA4-638E-4C78-8C47-0B8B8F01BBB7}.Debug|x86.Build.0 = Debug|x86
+		{ECB5DCA4-638E-4C78-8C47-0B8B8F01BBB7}.Release|x86.ActiveCfg = Release|x86
+		{ECB5DCA4-638E-4C78-8C47-0B8B8F01BBB7}.Release|x86.Build.0 = Release|x86
+		{79CDA18D-77A8-4900-AD7A-6817B3E0A914}.Debug|x86.ActiveCfg = Debug
+		{79CDA18D-77A8-4900-AD7A-6817B3E0A914}.Release|x86.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
