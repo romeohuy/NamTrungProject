@@ -147,18 +147,23 @@ namespace NamTrungProject
         {
             try
             {
-                int makh = 0;
-                int.TryParse(txtID.Text, out makh);
-                int count = HoaDon.All().Where(hd => hd.MaKH == makh).Count();
-                if (count <= 0)
-                {
-                    KhachHang.Delete(kh => kh.MaKH == makh);
+                DialogResult result = MessageBox.Show("Bạn có muốn xóa khách hàng này?", "Confirmation", MessageBoxButtons.YesNo);
+                if(result == DialogResult.Yes)
+                { 
+                    int makh = 0;
+                    int.TryParse(txtID.Text, out makh);
+                    int count = HoaDon.All().Where(hd => hd.MaKH == makh).Count();
+                    if (count <= 0)
+                    {KhachHang.Delete(kh => kh.MaKH == makh);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Khách hàng còn hóa đơn. Không thể xóa !");
+                    }
+                    ClearBinding();
                 }
-                else
-                {
-                    MessageBox.Show("Khách hàng còn hóa đơn. Không thể xóa !");
-                }
-                ClearBinding();
+                
+                
             }
             catch (System.Exception ex)
             {

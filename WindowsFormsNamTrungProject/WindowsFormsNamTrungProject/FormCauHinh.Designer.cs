@@ -100,7 +100,7 @@
             // 
             this.btnCapNhatCauHinh.Location = new System.Drawing.Point(191, 104);
             this.btnCapNhatCauHinh.Name = "btnCapNhatCauHinh";
-            this.btnCapNhatCauHinh.Size = new System.Drawing.Size(75, 23);
+            this.btnCapNhatCauHinh.Size = new System.Drawing.Size(82, 33);
             this.btnCapNhatCauHinh.TabIndex = 6;
             this.btnCapNhatCauHinh.Text = "Lưu lại";
             this.btnCapNhatCauHinh.UseVisualStyleBackColor = true;

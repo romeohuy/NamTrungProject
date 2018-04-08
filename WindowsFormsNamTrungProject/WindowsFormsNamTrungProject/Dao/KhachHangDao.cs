@@ -23,7 +23,7 @@ namespace NamTrungProject.Dao
         public static List<KhachHangModel> ListkhModel()
         {
             List<KhachHangModel> listKh = new List<KhachHangModel>();
-            foreach (var item in KhachHang.All())
+            foreach (var item in KhachHang.All().OrderBy(t=>t.TenKH))
             {
                 KhachHangModel kh = new KhachHangModel()
                 {

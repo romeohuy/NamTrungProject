@@ -13,13 +13,13 @@ namespace NamTrungProject
             InitializeComponent();
             cellDonGia.DataBindings.Add("Text", DataSource, "DonGia_");
             cellTenSP.DataBindings.Add("Text", DataSource, "TenSP_");
-            //cellSTT.DataBindings.Add("Text", DataSource, "STT");  cellSLMua.DataBindings.Add("Text", DataSource, "SoLuong_");
+            //cellSTT.DataBindings.Add("Text", DataSource, "STT");  
+            //cellSLMua.DataBindings.Add("Text", DataSource, "SoLuong_");
             cellThanhtien.DataBindings.Add("Text", DataSource, "ThanhTien_");
             txtDVT.DataBindings.Add("Text", DataSource, "DVT_");
             txtTienno.Text = tienno;
             cellTongTien.Text = tongtien;
-            cellTienMua.Text = tienmua;
-            cellGhichu.Text = ghichu;
+            cellTienMua.Text = tienmua;cellGhichu.Text = ghichu;
             cellDaTra.Text = datra;
             celConNo.Text = conno;
             lbkhachhang.Text = khachhang;

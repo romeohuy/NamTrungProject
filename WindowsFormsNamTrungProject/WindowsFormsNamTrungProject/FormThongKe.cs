@@ -23,6 +23,7 @@ namespace NamTrungProject
         IPagedList<SanPham> listSP;
         private List<SanPham> allSp;
         private int pageNumber = 1;
+        private int pageSize = 20;
         private double slTon = double.MinValue;
         private string search = "";
         SanPhamController spCtr = new SanPhamController();
@@ -31,7 +32,6 @@ namespace NamTrungProject
         {
             allSp = spCtr.GetAll();
             InitializeComponent();
-            
             try
             {
                 var cauhinh1Str = cauHinhDao.GetByName("DG1");
@@ -47,7 +47,7 @@ namespace NamTrungProject
             }
         }
 
-        private IPagedList<SanPham> GetPageListSanPham(int pageNumber = 1,int pageSize = 20)
+        private IPagedList<SanPham> GetPageListSanPham(int pageNumber = 1)
         {
             if (Math.Abs(slTon - double.MinValue) > 0)
             {
@@ -69,15 +69,17 @@ namespace NamTrungProject
         }
         private void FormThongKe_Load(object sender, EventArgs e)
         {
+            allSp = spCtr.GetAll();
             listSP =  GetPageListSanPham();
             btnPrew.Enabled = listSP.HasPreviousPage;
             btnNext.Enabled = listSP.HasNextPage;
-            BindingSource bd = new BindingSource() { DataSource = listSP.ToList() };
+            BindingSource bd = new BindingSource() { DataSource = listSP };
             dataGridView1.DataSource = bd;
             this.dataGridView1.Columns[0].Visible = false;
-            this.dataGridView1.Columns[1].Width = 80;
+            this.dataGridView1.Columns[1].Visible = false;
             this.dataGridView1.Columns[2].Width =300;
             lbPageNumber.Text = string.Format($"Trang {pageNumber}/{listSP.PageCount}");
+            txtSearch.Focus();
         }
 
         private void txtSoLuong_TextChanged(object sender, EventArgs e)
@@ -135,7 +137,7 @@ namespace NamTrungProject
         {
             AddNewSP frmNew = new AddNewSP();
             frmNew.ShowDialog();
-            FormThongKe_Load(sender, e);
+            FormThongKe_Load(null, null);
             dataGridView1.ClearSelection();
             int nRowIndex = dataGridView1.Rows.Count - 1;
             dataGridView1.Rows[nRowIndex].Selected = true;
@@ -180,6 +182,7 @@ namespace NamTrungProject
                 BindingSource bd = new BindingSource() { DataSource = listSP };
                 dataGridView1.DataSource = bd;
                 lbPageNumber.Text = string.Format($"Trang {pageNumber}/{listSP.PageCount}");
+                dataGridView1.Focus();
             }
         }
 
@@ -193,6 +196,39 @@ namespace NamTrungProject
                 BindingSource bd = new BindingSource() { DataSource = listSP };
                 dataGridView1.DataSource = bd;
                 lbPageNumber.Text = string.Format($"Trang {pageNumber}/{listSP.PageCount}");
+                dataGridView1.Focus();
+            }
+        }
+
+        private void cboSoLuongHienThi_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (int.TryParse(cboSoLuongHienThi.Text, out pageSize) == false)
+                {
+                    pageSize = 20;
+                }
+                FormThongKe_Load(null,null);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+
+        private void cboSoLuongHienThi_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (int.TryParse(cboSoLuongHienThi.Text, out pageSize) == false)
+                {
+                    pageSize = 20;
+                }
+                FormThongKe_Load(null,null);
+            }
+            catch (Exception)
+            {
+                // ignored
             }
         }
     }

@@ -55,13 +55,19 @@
             // 
             // gvKhachHang
             // 
+            this.gvKhachHang.AllowUserToAddRows = false;
+            this.gvKhachHang.AllowUserToDeleteRows = false;
+            this.gvKhachHang.AllowUserToResizeColumns = false;
+            this.gvKhachHang.AllowUserToResizeRows = false;
             this.gvKhachHang.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gvKhachHang.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.gvKhachHang.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gvKhachHang.Location = new System.Drawing.Point(1, 224);
+            this.gvKhachHang.MultiSelect = false;
             this.gvKhachHang.Name = "gvKhachHang";
+            this.gvKhachHang.ReadOnly = true;
             this.gvKhachHang.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gvKhachHang.Size = new System.Drawing.Size(948, 390);
             this.gvKhachHang.TabIndex = 0;

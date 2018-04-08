@@ -29,15 +29,15 @@ namespace NamTrungProject
         public FormMain()
         {
             InitializeComponent();
-            if (DateTime.Now.Month == 4 && DateTime.Now.Day == 15)
-            {
-                MessageBox.Show(@"Hết hạn sử dụng phần mềm");
-                this.Close();
-            }
+            //if (DateTime.Now.Month == 4 && DateTime.Now.Day == 15)
+            //{
+            //    MessageBox.Show(@"Hết hạn sử dụng phần mềm");
+            //    this.Close();
+            //}
         }
         private void FormMain_Load(object sender, EventArgs e)
         {
-            
+
             BindingSource dbSouce = new BindingSource() { DataSource = KhachHangController.GetAllKHModel() };
             cboKhachHang.DataSource = dbSouce;
             cboKhachHang.DisplayMember = "TenKH";
@@ -46,12 +46,29 @@ namespace NamTrungProject
             listSp = spCtr.GetDataGridSanPham(int.Parse(cboCapKH.Text), list_);
             BindingSource bdSource = new BindingSource() { DataSource = listSp };
             gvSanPham.DataSource = bdSource;
+            gvSanPham.Columns[0].Visible = false;
+            gvSanPham.Columns[4].DefaultCellStyle.Format = "##,###";
+            gvSanPham.Columns[5].DefaultCellStyle.Format = "##,###";
             cboKhachHang.Text = "";
             cboCapKH.SelectedIndex = 2;
+
+
+            gvChiTietHoaDon.Columns[7].DefaultCellStyle.Format = "##,###";
+            gvChiTietHoaDon.Columns[8].DefaultCellStyle.Format = "##,###";
+            gvChiTietHoaDon.Columns[9].DefaultCellStyle.Format = "##,###";
+            gvChiTietHoaDon.Columns[10].DefaultCellStyle.Format = "##,###";
+            gvChiTietHoaDon.Columns[11].DefaultCellStyle.Format = "##,###";
         }
 
         private void gvSanPham_KeyDown(object sender, KeyEventArgs e)
         {
+            if (string.IsNullOrEmpty(cboKhachHang.Text))
+            {
+                MessageBox.Show(@"Chưa chọn khách hàng");
+                this.txtSearch.Text = string.Empty;
+                cboKhachHang.Focus();
+                return;
+            }
             if (e.KeyCode == Keys.Enter)
             {
                 var dataGridViewRow = this.gvSanPham.CurrentRow;
@@ -64,6 +81,11 @@ namespace NamTrungProject
 
         private void txtSLMua_KeyPress(object sender, KeyPressEventArgs e)
         {
+            if (string.IsNullOrEmpty(cboKhachHang.Text))
+            {
+                MessageBox.Show(@"Chưa chọn khách hàng");
+                return;
+            }
             double slmua = 0;
             if (e.KeyChar == 13)
             {
@@ -121,7 +143,7 @@ namespace NamTrungProject
         {
             BindingSource bdSource = new BindingSource() { DataSource = spCtr.GetDataGridSanPham(int.Parse(cboCapKH.Text), list_) };
             this.gvSanPham.DataSource = bdSource;
-            listSp  = spCtr.GetDataGridSanPham(int.Parse(cboCapKH.Text),list_);
+            listSp = spCtr.GetDataGridSanPham(int.Parse(cboCapKH.Text), list_);
         }
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
@@ -158,7 +180,7 @@ namespace NamTrungProject
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show("Dữ liệu không hợp lệ !");
+                MessageBox.Show(@"Dữ liệu không hợp lệ !");
             }
 
         }
@@ -196,11 +218,11 @@ namespace NamTrungProject
                 int makh = 0;
                 int.TryParse(cboKhachHang.SelectedValue.ToString(), out makh);
                 kh = KhachHangController.Find(makh);
-               
+
                 if (kh != null)
                 {
-                    cboCapKH.SelectedIndex = kh.CapKH.Value - 1;
-                    txtTienNo.Text = (kh.TienNo - kh.DaTra).ToString();
+                    if (kh.CapKH != null) cboCapKH.SelectedIndex = kh.CapKH.Value - 1;
+                    txtTienNo.Text =(kh.TienNo.HasValue && kh.DaTra.HasValue && (kh.TienNo - kh.DaTra) > 0) ? (kh.TienNo - kh.DaTra).Value.ToString("##,###") : "0";
                 }
             }
             catch (System.Exception ex)
@@ -221,16 +243,19 @@ namespace NamTrungProject
                 }
                 else
                 {
-                    MessageBox.Show("Số tiền nhập không đúng !");
+                    MessageBox.Show(@"Số tiền nhập không đúng !");
                     txtTienNo.Focus();
                     return;
                 }
                 double? tienmua = ChiTietHoaDonController.TinhTienMua(listCtHoaDon);
-                this.lbTienmua.Text = tienmua.ToString();
-                double? tongtien = tienno + tienmua;
-                
-                lbThanhTien.Text = tongtien.ToString();
-                txtDatra_TextChanged(null,null);
+                if (tienmua != null)
+                {
+                    this.lbTienmua.Text = tienmua.Value.ToString("##,###");
+                    double? tongtien = tienno + tienmua;
+                    lbThanhTien.Text = tongtien.Value.ToString("##,###");
+                }
+
+                txtDatra_TextChanged(null, null);
             }
             //  gvSanPham.Refresh();
             // gvChiTietHoaDon.RefreshEdit();
@@ -248,12 +273,16 @@ namespace NamTrungProject
         {
             if (e.KeyValue == 46 || e.KeyCode.ToString() == "Delete")
             {
-                int vitri = gvChiTietHoaDon.CurrentRow.Index;
-                List<ChiTietHoaDonModel> listTemp = new List<ChiTietHoaDonModel>();
-                listTemp.AddRange(listCtHoaDon);
-                listTemp.RemoveAt(vitri);
-                listCtHoaDon.Clear();
-                listCtHoaDon.AddRange(listTemp);
+                if (gvChiTietHoaDon.CurrentRow != null)
+                {
+                    int vitri = gvChiTietHoaDon.CurrentRow.Index;
+                    List<ChiTietHoaDonModel> listTemp = new List<ChiTietHoaDonModel>();
+                    listTemp.AddRange(listCtHoaDon);
+                    listTemp.RemoveAt(vitri);
+                    listCtHoaDon.Clear();
+                    listCtHoaDon.AddRange(listTemp);
+                }
+
                 BindingSource bdSource = new BindingSource() { DataSource = listCtHoaDon };
                 gvChiTietHoaDon.DataSource = bdSource;
                 //MessageBox.Show(vi);
@@ -268,7 +297,7 @@ namespace NamTrungProject
 
             try
             {
-              KhachHang khOpen =  KhachHangController.Find(int.Parse(cboKhachHang.SelectedValue.ToString()));
+                KhachHang khOpen = KhachHangController.Find(int.Parse(cboKhachHang.SelectedValue.ToString()));
                 HoaDon hd = new HoaDon()
                 {
                     MaKH = int.Parse(cboKhachHang.SelectedValue.ToString()),
@@ -282,10 +311,10 @@ namespace NamTrungProject
 
                 if (ChiTietHoaDonController.AddMulti(hd.MaHD, listCtHoaDon))
                 {
-                    MessageBox.Show("Lưu thành công !");
+                    MessageBox.Show(@"Lưu thành công !");
                 }
                 else
-                    MessageBox.Show("Lỗi !");
+                    MessageBox.Show(@"Lỗi !");
             }
             catch (System.Exception ex)
             {
@@ -308,6 +337,8 @@ namespace NamTrungProject
             txtDatra.Text = "0";
             txtConNo.Text = "0";
             cboCapKH.SelectedIndex = 2;
+            ghichu = string.Empty;
+            kh = null;
         }
 
         private void btnPrint_Click(object sender, EventArgs e)
@@ -315,65 +346,105 @@ namespace NamTrungProject
 
             try
             {
-
-
-                double tienmua = listCtHoaDon.Sum(t => t.ThanhTien_).Value * 1000;
-                double tongtien = tienmua + double.Parse(txtTienNo.Text) * 1000;
-                double tienno = double.Parse(txtTienNo.Text);
-                double datra = double.Parse(txtDatra.Text);
-                double tienconno= double.Parse(txtConNo.Text);
-                double loinhuanRp = listCtHoaDon.Sum(ln => ln.LoiNhuanTong_).Value;
-                CapNhatTienKhachHang(listCtHoaDon.Sum(t => t.ThanhTien_).Value , datra, tienconno);
-                //cap nhat so luong ton
-                SanPhamDao spDao = new SanPhamDao();
-                for (int i = 1; i <= listCtHoaDon.Count; i++)
+                if (string.IsNullOrEmpty(cboKhachHang.Text))
                 {
-                    var soLuong = listCtHoaDon[i - 1].SoLuong_;
-                    if (soLuong != null)
-                    {
-                        var maSp = listCtHoaDon[i - 1].MaSP_;
-                        if (maSp != null)
-                            spDao.UpdateProcMua(soLuong.Value, maSp.Value);
-                    }
+                    MessageBox.Show(@"Chưa chọn khách hàng");
+                    return;
                 }
-                list_ = SanPham.All().ToList();
-                listSp = spCtr.GetDataGridSanPham(int.Parse(cboCapKH.Text), list_);
-                BindingSource bdSource = new BindingSource() { DataSource = listSp };
-                gvSanPham.DataSource = bdSource;
-                txtDatra.Text = "0";txtConNo.Text = "0";
-                CultureInfo vietnam = new CultureInfo(1066);
-                CultureInfo usa = new CultureInfo("en-US");
-                NumberFormatInfo nfi = usa.NumberFormat;
-                nfi = (NumberFormatInfo)nfi.Clone();
-                NumberFormatInfo vnfi = vietnam.NumberFormat;
-                nfi.CurrencySymbol = vnfi.CurrencySymbol;
-                nfi.CurrencyNegativePattern = vnfi.CurrencyNegativePattern;
-                nfi.CurrencyPositivePattern = vnfi.CurrencyPositivePattern;
-                XtraReportHoaDonMuaHang report = new XtraReportHoaDonMuaHang(tienmua.ToString("c0", nfi), tongtien.ToString("c0", nfi), (tienno*1000).ToString("c0", nfi), ghichu, cboKhachHang.Text, loinhuanRp.ToString(),(datra*1000).ToString("c0",nfi),(tienconno*1000).ToString("c0",nfi));
+                if (kh == null)
+                {
+                    kh = new KhachHang();
+                    kh.TenKH = cboKhachHang.Text;
+                    int capKh = 0;
+                    int.TryParse(cboCapKH.Text, out capKh);
+                    kh.CapKH = capKh;
+                    kh.TienNo = 0;
+                    kh.TongTien = 0;
+                    kh.DaTra = 0;
+                    kh.DiaChi = @"Chưa có";
+                    kh.DienThoai = @"Chưa có";
+                }
+                kh.Save();
+                if (kh.MaKH > 0)
+                {
+                    double? sum = 0;
+                    foreach (var t in listCtHoaDon)
+                    {
+                        var d = t.ThanhTien_;
+                        if (d.HasValue) sum += d.Value;
+                    }
 
-                // BindingSource bdChitiethoadon = new BindingSource() { DataSource = listCtHoaDon };
-                // gvChiTietHoaDon.DataSource = bdChitiethoadon;
-                report.DataSource = listCtHoaDon;
-                report.ShowRibbonPreview();
-                report.ExportOptions.Pdf.DocumentOptions.Title = cboKhachHang.Text + lbTienmua.Text + txtDatra.Text + loinhuanRp;
+                    double tienmua = sum.Value;
+                    double tongtien = tienmua + double.Parse(txtTienNo.Text);
+                    double tienno = double.Parse(txtTienNo.Text);
+                    double datra = double.Parse(txtDatra.Text);
+                    double tienconno = double.Parse(txtConNo.Text);
+                    double? sum1 = 0;
+                    foreach (var ln in listCtHoaDon)
+                    {
+                        var d = ln.LoiNhuanTong_;
+                        if (d.HasValue) sum1 += d.Value;
+                    }
 
-                string pathSave = ConfigurationManager.AppSettings["SaveOrder"];
-                report.Print();
-                report.ExportToPdf(pathSave + cboKhachHang.Text + "_" + lbTienmua.Text + "_" + txtDatra.Text + "_" + loinhuanRp + ".pdf");
-                //InitGrid();
-                //txtTienNo.Text = kh.TienNo.ToString();
-                
+                    double loinhuanRp = sum1.Value;
+                    double? sum2 = 0;
+                    foreach (var t in listCtHoaDon)
+                    {
+                        var d = t.ThanhTien_;
+                        if (d.HasValue) sum2 += d.Value;
+                    }
+
+                    CapNhatTienKhachHang(sum2.Value, datra, tienconno);
+                    //cap nhat so luong ton
+                    SanPhamDao spDao = new SanPhamDao();
+                    for (int i = 1; i <= listCtHoaDon.Count; i++)
+                    {
+                        var soLuong = listCtHoaDon[i - 1].SoLuong_;
+                        if (soLuong != null)
+                        {
+                            var maSp = listCtHoaDon[i - 1].MaSP_;
+                            if (maSp != null)
+                                spDao.UpdateProcMua(soLuong.Value, maSp.Value);
+                        }
+                    }
+                    list_ = SanPham.All().ToList();
+                    listSp = spCtr.GetDataGridSanPham(int.Parse(cboCapKH.Text), list_);
+                    BindingSource bdSource = new BindingSource() { DataSource = listSp };
+                    gvSanPham.DataSource = bdSource;
+                    //txtDatra.Text = @"0";
+                    //txtConNo.Text = @"0";
+                    //lbThanhTien.Text = @"0";
+                    //lbTienmua.Text = @"0";
+                    CultureInfo vietnam = new CultureInfo(1066);
+                    CultureInfo usa = new CultureInfo("en-US");
+                    NumberFormatInfo nfi = usa.NumberFormat;
+                    nfi = (NumberFormatInfo)nfi.Clone();
+                    NumberFormatInfo vnfi = vietnam.NumberFormat;
+                    nfi.CurrencySymbol = vnfi.CurrencySymbol;
+                    nfi.CurrencyNegativePattern = vnfi.CurrencyNegativePattern;
+                    nfi.CurrencyPositivePattern = vnfi.CurrencyPositivePattern;
+                    XtraReportHoaDonMuaHang report = new XtraReportHoaDonMuaHang(tienmua.ToString("c0", nfi), tongtien.ToString("c0", nfi), (tienno * 1000).ToString("c0", nfi), ghichu, cboKhachHang.Text, loinhuanRp.ToString("##,###"), (datra).ToString("c0", nfi), (tienconno).ToString("c0", nfi));
+
+                    report.DataSource = listCtHoaDon;
+                    report.ShowRibbonPreview();
+                    report.ExportOptions.Pdf.DocumentOptions.Title = cboKhachHang.Text + lbTienmua.Text + txtDatra.Text + loinhuanRp;
+
+                    string pathSave = ConfigurationManager.AppSettings["SaveOrder"];
+                    report.Print();
+                    var dtNow = DateTime.Now;
+                    report.ExportToPdf(pathSave + cboKhachHang.Text + "_" + $"{dtNow.Day}_{dtNow.Month}_{dtNow.Year}_{dtNow.Hour}_{dtNow.Minute}_{dtNow.Second}" + ".pdf");
+                }
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show(@"Chưa chọn hóa đơn");
+                MessageBox.Show(@"Vui lòng kiểm tra lại dữ liệu!");
             }
 
         }
 
         private void btnGhiChu_Click(object sender, EventArgs e)
         {
-            FormGhiChu frmGhichu = new FormGhiChu();
+            FormGhiChu frmGhichu = new FormGhiChu(ghichu);
             frmGhichu.ShowDialog();
             if (frmGhichu.IsDisposed)
             {
@@ -384,7 +455,7 @@ namespace NamTrungProject
         private void gvChiTietHoaDon_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             //gvChiTietHoaDon.Rows[e.RowIndex].Cells[e.ColumnIndex].ErrorText = "Không hợp lệ ";
-            MessageBox.Show("Dữ liệu không hợp lệ !");
+            MessageBox.Show(@"Dữ liệu không hợp lệ !");
         }
 
         private void btnOpenOrder_Click(object sender, EventArgs e)
@@ -396,10 +467,10 @@ namespace NamTrungProject
                 //DataRow row = frmHD.row;
                 int maHD = frmHD.maHD;
                 int maKh = frmHD.maKH;
-                kh = KhachHang.SingleOrDefault(t=>t.MaKH == maKh);
-                txtTienNo.Text = frmHD.tienno_.ToString(CultureInfo.InvariantCulture);
-                lbTienmua.Text = (frmHD.tongtien_ - frmHD.tienno_).ToString(CultureInfo.InvariantCulture);
-                lbThanhTien.Text = frmHD.tongtien_.ToString(CultureInfo.InvariantCulture);
+                kh = KhachHang.SingleOrDefault(t => t.MaKH == maKh);
+                txtTienNo.Text = frmHD.tienno_.ToString("##,###");
+                lbTienmua.Text = (frmHD.tongtien_ - frmHD.tienno_).ToString("##,###");
+                lbThanhTien.Text = frmHD.tongtien_.ToString("##,###");
                 List<ChiTietHoaDonModel> listNew = new List<ChiTietHoaDonModel>();
                 listCtHoaDon = listNew;
                 listCtHoaDon.AddRange(ChiTietHoaDonController.GetAllByMaHD(maHD));
@@ -441,7 +512,7 @@ namespace NamTrungProject
                 ctModel.DVT_ = formThem.dvt;
                 ctModel.DonGia_ = formThem.dongia;
                 ctModel.LoiNhuan_ = formThem.dongia - formThem.dongiagoc;
-                ctModel.LoiNhuanTong_ = (formThem.dongia - formThem.dongiagoc)*formThem.slmua;
+                ctModel.LoiNhuanTong_ = (formThem.dongia - formThem.dongiagoc) * formThem.slmua;
                 ctModel.ThanhTien_ = formThem.slmua * formThem.dongia;
                 ctModel.MaHD_ = this.maHD;
                 ctModel.MaSP_ = 0;
@@ -463,7 +534,7 @@ namespace NamTrungProject
             CapNhatTextFieldTinhTien();
         }
 
-        private void CapNhatTienKhachHang(double tienmua,double tientra,double tiencon)
+        private void CapNhatTienKhachHang(double tienmua, double tientra, double tiencon)
         {
             KhachHang khUpdate = KhachHang.Find(k => k.MaKH == kh.MaKH).FirstOrDefault();
             if (khUpdate != null)
@@ -492,9 +563,9 @@ namespace NamTrungProject
                         if (d.HasValue) sum += d.Value;
                     }
 
-                    Double tienmua = sum.Value;
-                     Double tongtien = tienmua + double.Parse(txtTienNo.Text);
-                    txtConNo.Text = (tongtien- tientra).ToString(CultureInfo.InvariantCulture);
+                    double tienmua = sum.Value;
+                    double tongtien = tienmua + double.Parse(txtTienNo.Text);
+                    txtConNo.Text = (tongtien - tientra).ToString("##,###");
                 }
                 else
                     MessageBox.Show(@"Giá trị không hợp lệ !");
@@ -506,7 +577,7 @@ namespace NamTrungProject
             }
         }
 
-       
+
 
         //private void gvChiTietHoaDon_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         //{

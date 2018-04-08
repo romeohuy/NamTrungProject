@@ -12,9 +12,10 @@ namespace NamTrungProject
     public partial class FormGhiChu : Form
     {
         public string ghichu_ = null;
-        public FormGhiChu()
+        public FormGhiChu(string ghichu)
         {
             InitializeComponent();
+            this.txtGhichu.Text = ghichu;
         }
 
         private void btnOk_Click(object sender, EventArgs e)

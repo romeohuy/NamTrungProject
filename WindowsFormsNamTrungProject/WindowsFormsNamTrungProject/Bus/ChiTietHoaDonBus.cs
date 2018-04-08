@@ -22,9 +22,9 @@ namespace NamTrungProject.Bus
                 TonDau_ = spModel_.SLTon_,
                 DonGia_ = spModel_.DonGia_,
                 DVT_ = spModel_.DVT_,
-                ThanhTien_ = slMua * spModel_.DonGia_,
-                LoiNhuan_ = spModel_.DonGia_ - spModel_.GiaGoc_,
-                LoiNhuanTong_ = (spModel_.DonGia_ - spModel_.GiaGoc_)*slMua,
+                ThanhTien_ = Math.Round((slMua * spModel_.DonGia_).Value, 1, MidpointRounding.AwayFromZero),
+                LoiNhuan_ = Math.Round((spModel_.DonGia_ - spModel_.GiaGoc_).Value, 1, MidpointRounding.AwayFromZero),
+                LoiNhuanTong_ = Math.Round(((spModel_.DonGia_ - spModel_.GiaGoc_)*slMua).Value,1,MidpointRounding.AwayFromZero),
                 DonGiaGoc_ = spModel_.GiaGoc_,
                 STT_ = 0
             };
@@ -116,9 +116,9 @@ namespace NamTrungProject.Bus
         {
             foreach (var item in listSanPhamMua)
             {
-                item.LoiNhuan_ = item.DonGia_ - item.DonGiaGoc_;
-                item.ThanhTien_ = item.SoLuong_ * item.DonGia_;
-                item.LoiNhuanTong_ = item.LoiNhuan_ * item.SoLuong_;
+                item.LoiNhuan_ = Math.Round((item.DonGia_ - item.DonGiaGoc_).Value,1,MidpointRounding.AwayFromZero);
+                item.ThanhTien_ = Math.Round((item.SoLuong_ * item.DonGia_).Value,1,MidpointRounding.AwayFromZero);
+                item.LoiNhuanTong_ = Math.Round((item.LoiNhuan_ * item.SoLuong_).Value,1,MidpointRounding.AwayFromZero);
             }
         }
 
